@@ -4,7 +4,9 @@ var events = require("events"),
 var OplogWatcher = module.exports = function OplogWatcher(options) {
   events.EventEmitter.call(this);
 
-  this._db = mongo.db([options.host || "localhost", options.oplogDb || "local"].join("/"), {safe: true});
+  options = options || {};
+
+  this._db = mongo.db([[options.host || "localhost", options.port || "27017"].join(":"), options.oplogDb || "local"].join("/"), {safe: true});
   this._collection = this._db.collection(options.oplogCollection || "oplog.rs");
 
   var self = this;
