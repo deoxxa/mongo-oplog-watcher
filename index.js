@@ -22,7 +22,7 @@ var OplogWatcher = module.exports = function OplogWatcher(options) {
       q.ns = options.ns;
     }
 
-    self._collection.find(q, {tailable: true}, function(err, cursor) {
+    self._collection.find(q, projection(options.fields), {tailable: true}, function(err, cursor) {
       if (err) {
         return self.emit("error", err);
       }
@@ -60,3 +60,15 @@ var OplogWatcher = module.exports = function OplogWatcher(options) {
   setImmediate(openLog);
 };
 OplogWatcher.prototype = Object.create(events.EventEmitter.prototype, {constructor: {value: OplogWatcher}});
+
+function projection(fields) {
+  if (!fields) return {};
+
+  var projection = {op:1};
+  
+  fields.split(' ').forEach( function(field) {
+    projection["o." + field] = 1;
+  });
+
+  return projection;
+}
